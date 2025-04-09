@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/zachrundle/hotel-website/pkg/config"
+	"github.com/zachrundle/hotel-website/pkg/models"
 )
 
 var app *config.AppConfig
@@ -17,8 +18,14 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	
+
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
+
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
+
 	var tc map[string]*template.Template
 
 	// The UseCache allows us to turn off cache (and read from disk instead) such as if we were wanting to go in to development mode
@@ -37,8 +44,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
 	buf := new(bytes.Buffer)
 
+	td = AddDefaultData(td)
 	// this gives finer error handling
-	err := t.Execute(buf, nil)
+	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
