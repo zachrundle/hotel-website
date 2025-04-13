@@ -27,14 +27,17 @@ func AddDefaultData(td *models.TemplateData) *models.TemplateData {
 func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 
 	var tc map[string]*template.Template
-
+	var err error
 	// The UseCache allows us to turn off cache (and read from disk instead) such as if we were wanting to go in to development mode
 	if app.UseCache {
 		// create a template cache
 		// get the template cache from the app config
 		tc = app.TemplateCache
 	} else {
-		tc, _ = CreateTemplateCache()
+		tc, err = CreateTemplateCache()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	// get requested template from cache
 	t, ok := tc[tmpl]
@@ -46,7 +49,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 
 	td = AddDefaultData(td)
 	// this gives finer error handling
-	err := t.Execute(buf, td)
+	err = t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}

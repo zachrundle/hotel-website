@@ -4,19 +4,32 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/zachrundle/hotel-website/pkg/config"
 	"github.com/zachrundle/hotel-website/pkg/handlers"
 	"github.com/zachrundle/hotel-website/pkg/render"
 )
 
 const portNumber = ":8080"
-
+var app config.AppConfig
+var session *scs.SessionManager
 
 
 // main is the main application function
 func main() {
-  var app config.AppConfig
+
+  // change this to true when in production
+  app.UseSSL = false
+  app.SameSite = http.SameSiteLaxMode
+  session = scs.New()
+  session.Lifetime = 24 * time.Hour
+  session.Cookie.Persist = true
+  session.Cookie.SameSite = app.SameSite
+  session.Cookie.Secure = app.UseSSL
+
+  app.Session = session
 
   tc, err := render.CreateTemplateCache()
   if err != nil {
@@ -31,12 +44,15 @@ func main() {
 
   render.NewTemplates(&app)
 
-  http.HandleFunc("/", handlers.Repo.Home)
-  http.HandleFunc("/about", handlers.Repo.About)
-
   
   fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
-  http.ListenAndServe(portNumber, nil)
 
+  srv := &http.Server{
+    Addr: portNumber,
+    Handler: routes(&app),
+  }
+
+  err = srv.ListenAndServe()
+  log.Fatal(err)
 }
  
