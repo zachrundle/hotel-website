@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/zachrundle/hotel-website/pkg/config"
-	"github.com/zachrundle/hotel-website/pkg/handlers"
-	"github.com/zachrundle/hotel-website/pkg/render"
+	"github.com/zachrundle/hotel-website/internal/config"
+	"github.com/zachrundle/hotel-website/internal/handlers"
+	"github.com/zachrundle/hotel-website/internal/render"
 )
 
 const portNumber = ":8080"
