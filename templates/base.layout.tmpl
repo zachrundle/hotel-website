@@ -131,6 +131,18 @@
 				})
 			}
 
+			{ { with .Flash} }
+			notify("{{.}}", "success")
+			{ { end } }
+
+			{ { with .Warning} }
+			notify("{{.}}", "warning")
+			{ { end } }
+
+			{ { with .Error} }
+			notify("{{.}}", "error")
+			{ { end } }
+
 			function notifyModal(title, text, icon, confirmationButton) {
 				Swal.fire({
 					title: title,
@@ -139,6 +151,7 @@
 					confirmButtonText: confirmationButton
 				})
 			}
+
 
 			function Prompt() {
 				let toast = function (c) {
@@ -224,7 +237,7 @@
 							if (result.value !== "") {
 								if (c.callback !== undefined) {
 									c.callback(result);
-								}	
+								}
 							} else {
 								c.callback(false);
 							}
