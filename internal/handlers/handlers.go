@@ -170,3 +170,4 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 		Data: data, 
 	})
 }
+
