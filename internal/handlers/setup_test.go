@@ -7,6 +7,7 @@ import (
 	"github.com/zachrundle/hotel-website/internal/config"
 	"encoding/gob"
 	"time"
+	"os"
 	"github.com/zachrundle/hotel-website/internal/models"
 	"github.com/zachrundle/hotel-website/internal/render"
 	"github.com/justinas/nosurf"
@@ -29,6 +30,12 @@ func getRoutes() http.Handler {
 
 	// change this to true when in production
 	app.UseSSL = false
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	app.SameSite = http.SameSiteLaxMode
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -56,7 +63,7 @@ func getRoutes() http.Handler {
 	// middleware allows you to process a request and perform some logic on it (like restricting access to only authenticated users)
 
 	mux.Use(middleware.Recoverer)
-	mux.Use(NoSurf)
+	// mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)

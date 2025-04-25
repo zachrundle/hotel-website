@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/zachrundle/hotel-website/internal/config"
 	"github.com/zachrundle/hotel-website/internal/handlers"
+	"github.com/zachrundle/hotel-website/internal/helpers"
 	"github.com/zachrundle/hotel-website/internal/models"
 	"github.com/zachrundle/hotel-website/internal/render"
 )
@@ -18,14 +20,15 @@ const portNumber = ":8080"
 
 var app config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 // main is the main application function
 func main() {
-  err := run()
-  if err != nil {
-    log.Fatal(err)
-  }
-
+	err := run()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
 
@@ -39,10 +42,17 @@ func main() {
 }
 
 func run() error {
-  gob.Register(models.Reservation{})
+	gob.Register(models.Reservation{})
 
 	// change this to true when in production
 	app.UseSSL = false
+
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	app.SameSite = http.SameSiteLaxMode
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -55,7 +65,7 @@ func run() error {
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatalf("cannot create template cache: %v", err)
-    return err
+		return err
 	}
 
 	app.TemplateCache = tc
@@ -63,7 +73,7 @@ func run() error {
 
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
-
+	helpers.NewHelpers(&app)
 	render.NewTemplates(&app)
-  return nil
+	return nil
 }
