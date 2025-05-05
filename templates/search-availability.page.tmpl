@@ -13,7 +13,7 @@
 						<input required class="form-control" type="text" name="start" placeholder="Arrival">
 					</div>
 					<div class="col-md-6">
-						<input requierd class="form-control" type="text" name="end" placeholder="Departure">
+						<input required class="form-control" type="text" name="end" placeholder="Departure">
 					</div>
 				</div>
 				<hr>
@@ -31,6 +31,7 @@
 <script>
 	const elem = document.getElementById('reservation-dates');
 	const rangepicker = new DateRangePicker(elem, {
+		format: 'yyyy-mm-dd'
 		// ...options
 	});
 </script>
